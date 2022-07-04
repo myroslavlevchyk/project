@@ -1,0 +1,14 @@
+---
+ - name: start services
+   hosts: PROD_SERVERS
+   become: true
+  
+   tasks:           
+     - name: DELETE Docker container image
+       command: docker rm -f apache2container
+
+     - name: PULL Docker container image
+       command: docker pull myroslavlevchyk/apacheubuntu2:latest
+  
+     - name: RUN Docker container image
+       command: docker run -d -p 40440:80 --name apache2container myroslavlevchyk/apacheubuntu2:latest  

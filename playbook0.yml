@@ -1,0 +1,30 @@
+---
+ - name: start services
+   hosts: localhost
+
+   vars:
+       DOCKER_USERNAME: myroslavlevchyk
+       DOCKER_PASSWORD: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          61346330623164323330313236313864666630323432383434636530633334633930333338356336
+          3838393232343436373965633763323935313130633730660a306434393630386665366539363734
+          31663936653365653637633937613162313139353866323539313832393238303464396563636463
+          6365636439303363350a356162326661626439376333326566333136626635346135633336306634
+          3036
+   tasks:
+     - name: Clone Git Repo
+       git:
+         repo: https://github.com/myroslavlevchyk/lmwproject.git
+         dest: /home/levchyk5/lmwproject/lmwproject
+         force: yes
+         clone: yes
+         update: yes
+
+     - name: Build Docker container image
+       command: chdir=/home/levchyk5/lmwproject/lmwproject docker build -t myroslavlevchyk/apacheubuntu2:latest -f /home/levchyk5/lmwproject/myproject/Dockerfile .        
+     
+     - name: ECHO Docker container image
+       command: docker login -u={{DOCKER_USERNAME}} -p={{DOCKER_PASSWORD}}
+
+     - name: PUSH Docker container image
+       command: docker push myroslavlevchyk/apacheubuntu2:latest
